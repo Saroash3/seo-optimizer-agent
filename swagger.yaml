@@ -1,0 +1,629 @@
+openapi: 3.0.3
+info:
+  title: SEO Optimizer Agent API
+  description: |
+    AI-powered SEO content analysis agent that provides comprehensive SEO optimization recommendations.
+    
+    ## Features
+    - **Keyword Analysis**: Analyzes keyword density and distribution
+    - **Readability Scoring**: Calculates Flesch Reading Ease scores
+    - **Meta Tag Analysis**: Evaluates title length and quality
+    - **Heading Structure**: Validates H1, H2, H3 hierarchy
+    - **Content Quality**: Assesses word count and structure
+    - **Memory Management**: Stores short-term and long-term analysis history
+    
+    ## Architecture
+    This agent follows the Supervisor-Worker (Registry) architecture pattern and communicates via HTTP/JSON.
+  version: 1.0.0
+  contact:
+    name: SEO Optimizer Team
+    email: support@seo-optimizer.local
+  license:
+    name: Educational Project
+    url: https://github.com/example/seo-optimizer
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: http://localhost:8080
+    description: Alternative port
+
+tags:
+  - name: Health & Monitoring
+    description: Health checks and status monitoring
+  - name: Registration
+    description: Agent registration with supervisor
+  - name: Analysis
+    description: SEO content analysis operations
+  - name: History
+    description: Historical data and statistics
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health & Monitoring
+      summary: Health Check
+      description: Check if the agent is running and operational
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Agent is healthy and operational
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                agent_id: seo_optimizer_001
+                agent_name: SEO Optimizer Agent
+                version: 1.0.0
+                timestamp: "2025-11-22T18:30:00.123456"
+                uptime: operational
+
+  /register:
+    post:
+      tags:
+        - Registration
+      summary: Register with Supervisor
+      description: Register the agent with the supervisor system
+      operationId: registerAgent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+            example:
+              supervisor_id: supervisor_001
+              supervisor_url: http://supervisor:5001
+      responses:
+        '200':
+          description: Successfully registered with supervisor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+              example:
+                agent_id: seo_optimizer_001
+                name: SEO Optimizer Agent
+                version: 1.0.0
+                capabilities:
+                  - keyword_analysis
+                  - readability_check
+                  - meta_tag_analysis
+                  - heading_structure_check
+                  - content_optimization
+                endpoints:
+                  health: /health
+                  analyze: /analyze
+                  status: /status
+                status: registered
+                timestamp: "2025-11-22T18:30:00.123456"
+        '500':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /analyze:
+    post:
+      tags:
+        - Analysis
+      summary: Analyze Content
+      description: |
+        Perform comprehensive SEO analysis on provided content.
+        
+        Returns:
+        - Overall SEO score (0-100)
+        - Keyword density analysis
+        - Readability metrics (Flesch Reading Ease)
+        - Meta tag quality
+        - Heading structure evaluation
+        - Content quality assessment
+        - Actionable recommendations
+      operationId: analyzeContent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalysisRequest'
+            examples:
+              basicAnalysis:
+                summary: Basic SEO Analysis
+                value:
+                  content:
+                    title: "10 Best SEO Tips for 2025"
+                    body: "SEO is crucial for website visibility. Search engine optimization helps your content rank better in search results. Good SEO practices include keyword research, quality content creation, and proper meta tags."
+                    target_keywords:
+                      - SEO
+                      - optimization
+                      - ranking
+              detailedAnalysis:
+                summary: Detailed Analysis with URL
+                value:
+                  task_id: article_123_analysis
+                  content:
+                    title: "Complete Guide to Python Programming"
+                    body: "Python is one of the most popular programming languages. Learning Python opens many opportunities..."
+                    target_keywords:
+                      - Python
+                      - programming
+                    url: https://example.com/python-guide
+                  options:
+                    detailed_analysis: true
+      responses:
+        '200':
+          description: Analysis completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResponse'
+              example:
+                agent_id: seo_optimizer_001
+                task_id: task_1732307415.123
+                status: success
+                analysis:
+                  overall_score: 75
+                  keyword_analysis:
+                    keywords:
+                      SEO:
+                        count: 5
+                        density: 2.5
+                        status: optimal
+                    total_words: 200
+                    unique_words: 150
+                  readability:
+                    score: 68.5
+                    level: Standard
+                    grade: 8th-9th grade
+                    avg_sentence_length: 15.2
+                    total_sentences: 12
+                    total_words: 200
+                  meta_analysis:
+                    title_length: 26
+                    title_quality: too_short
+                    title_present: true
+                  heading_structure:
+                    h1_count: 1
+                    h2_count: 3
+                    h3_count: 2
+                    total_headings: 6
+                    structure_quality: excellent
+                  content_quality:
+                    word_count: 200
+                    character_count: 1200
+                    paragraph_count: 5
+                    length_quality: too_short
+                  recommendations:
+                    - "Expand your title - current length 26 chars (optimal: 50-60 chars)"
+                    - "Expand content length - current 200 words (aim for 500+ words)"
+                timestamp: "2025-11-22T18:30:00.123456"
+        '400':
+          description: Bad request - missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: error
+                message: "Missing required 'content' field"
+        '500':
+          description: Internal server error during analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                agent_id: seo_optimizer_001
+                status: error
+                message: "Analysis failed: invalid content format"
+                timestamp: "2025-11-22T18:30:00.123456"
+
+  /status:
+    get:
+      tags:
+        - Health & Monitoring
+      summary: Get Agent Status
+      description: Retrieve agent statistics, memory usage, and performance metrics
+      operationId: getStatus
+      responses:
+        '200':
+          description: Status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+              example:
+                agent_id: seo_optimizer_001
+                status: operational
+                statistics:
+                  short_term:
+                    active_sessions: 2
+                    completed_sessions: 15
+                    total_results_cached: 17
+                  long_term:
+                    total_analyses_archived: 45
+                    average_overall_score: 72.3
+                    average_readability_score: 65.8
+                  lifetime_stats:
+                    total_sessions: 17
+                    total_analyses: 17
+                timestamp: "2025-11-22T18:30:00.123456"
+        '500':
+          description: Status check failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /history/{task_id}:
+    get:
+      tags:
+        - History
+      summary: Get Task History
+      description: Retrieve historical analysis results for a specific task
+      operationId: getTaskHistory
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          description: Unique task identifier
+          schema:
+            type: string
+          example: task_001
+      responses:
+        '200':
+          description: Task history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+        '404':
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                status: error
+                message: "Task task_001 not found"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: healthy
+          description: Health status of the agent
+        agent_id:
+          type: string
+          example: seo_optimizer_001
+          description: Unique agent identifier
+        agent_name:
+          type: string
+          example: SEO Optimizer Agent
+          description: Human-readable agent name
+        version:
+          type: string
+          example: 1.0.0
+          description: Agent version
+        timestamp:
+          type: string
+          format: date-time
+          description: Current timestamp
+        uptime:
+          type: string
+          example: operational
+          description: Uptime status
+
+    RegistrationRequest:
+      type: object
+      required:
+        - supervisor_id
+        - supervisor_url
+      properties:
+        supervisor_id:
+          type: string
+          example: supervisor_001
+          description: Unique supervisor identifier
+        supervisor_url:
+          type: string
+          format: uri
+          example: http://supervisor:5001
+          description: Supervisor callback URL
+
+    RegistrationResponse:
+      type: object
+      properties:
+        agent_id:
+          type: string
+          example: seo_optimizer_001
+        name:
+          type: string
+          example: SEO Optimizer Agent
+        version:
+          type: string
+          example: 1.0.0
+        capabilities:
+          type: array
+          items:
+            type: string
+          example:
+            - keyword_analysis
+            - readability_check
+        endpoints:
+          type: object
+          additionalProperties:
+            type: string
+        status:
+          type: string
+          example: registered
+        timestamp:
+          type: string
+          format: date-time
+
+    AnalysisRequest:
+      type: object
+      required:
+        - content
+      properties:
+        task_id:
+          type: string
+          description: Optional task identifier (auto-generated if not provided)
+          example: task_001
+        task_type:
+          type: string
+          description: Type of analysis
+          default: analyze_content
+          example: analyze_content
+        content:
+          type: object
+          required:
+            - title
+            - body
+          properties:
+            title:
+              type: string
+              description: Article or page title
+              example: "10 Best SEO Tips for 2025"
+              minLength: 1
+              maxLength: 200
+            body:
+              type: string
+              description: Main content text
+              example: "SEO is crucial for website visibility..."
+              minLength: 1
+            target_keywords:
+              type: array
+              items:
+                type: string
+              description: Keywords to optimize for
+              example:
+                - SEO
+                - optimization
+            url:
+              type: string
+              format: uri
+              description: Optional URL for context
+              example: https://example.com/article
+        options:
+          type: object
+          properties:
+            detailed_analysis:
+              type: boolean
+              description: Enable detailed analysis
+              default: true
+
+    AnalysisResponse:
+      type: object
+      properties:
+        agent_id:
+          type: string
+          example: seo_optimizer_001
+        task_id:
+          type: string
+          example: task_001
+        status:
+          type: string
+          enum:
+            - success
+            - error
+          example: success
+        analysis:
+          type: object
+          properties:
+            overall_score:
+              type: integer
+              minimum: 0
+              maximum: 100
+              description: Overall SEO score
+              example: 75
+            keyword_analysis:
+              $ref: '#/components/schemas/KeywordAnalysis'
+            readability:
+              $ref: '#/components/schemas/ReadabilityMetrics'
+            meta_analysis:
+              $ref: '#/components/schemas/MetaAnalysis'
+            heading_structure:
+              $ref: '#/components/schemas/HeadingStructure'
+            content_quality:
+              $ref: '#/components/schemas/ContentQuality'
+            recommendations:
+              type: array
+              items:
+                type: string
+              description: Actionable SEO recommendations
+        timestamp:
+          type: string
+          format: date-time
+
+    KeywordAnalysis:
+      type: object
+      properties:
+        keywords:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              count:
+                type: integer
+                description: Number of occurrences
+              density:
+                type: number
+                format: float
+                description: Percentage of total words
+              status:
+                type: string
+                enum:
+                  - optimal
+                  - too_low
+                  - acceptable
+                  - too_high
+        total_words:
+          type: integer
+        unique_words:
+          type: integer
+
+    ReadabilityMetrics:
+      type: object
+      properties:
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          description: Flesch Reading Ease score
+        level:
+          type: string
+          description: Reading difficulty level
+          example: Standard
+        grade:
+          type: string
+          description: Reading grade level
+          example: 8th-9th grade
+        avg_sentence_length:
+          type: number
+          format: float
+        total_sentences:
+          type: integer
+        total_words:
+          type: integer
+
+    MetaAnalysis:
+      type: object
+      properties:
+        title_length:
+          type: integer
+          description: Title character count
+        title_quality:
+          type: string
+          enum:
+            - optimal
+            - acceptable
+            - too_short
+            - too_long
+        title_present:
+          type: boolean
+
+    HeadingStructure:
+      type: object
+      properties:
+        h1_count:
+          type: integer
+        h2_count:
+          type: integer
+        h3_count:
+          type: integer
+        total_headings:
+          type: integer
+        structure_quality:
+          type: string
+          enum:
+            - excellent
+            - good
+            - needs_improvement
+            - poor
+
+    ContentQuality:
+      type: object
+      properties:
+        word_count:
+          type: integer
+        character_count:
+          type: integer
+        paragraph_count:
+          type: integer
+        length_quality:
+          type: string
+          enum:
+            - excellent
+            - good
+            - acceptable
+            - too_short
+
+    StatusResponse:
+      type: object
+      properties:
+        agent_id:
+          type: string
+        status:
+          type: string
+        statistics:
+          type: object
+          properties:
+            short_term:
+              type: object
+              properties:
+                active_sessions:
+                  type: integer
+                completed_sessions:
+                  type: integer
+                total_results_cached:
+                  type: integer
+            long_term:
+              type: object
+              properties:
+                total_analyses_archived:
+                  type: integer
+                average_overall_score:
+                  type: number
+                  format: float
+                average_readability_score:
+                  type: number
+                  format: float
+            lifetime_stats:
+              type: object
+        timestamp:
+          type: string
+          format: date-time
+
+    HistoryResponse:
+      type: object
+      properties:
+        result:
+          $ref: '#/components/schemas/AnalysisResponse'
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          description: Error description
+        agent_id:
+          type: string
+          description: Agent identifier (optional)
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp (optional)
