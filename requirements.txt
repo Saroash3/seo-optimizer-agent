@@ -3,3 +3,4 @@ Werkzeug==3.0.1
 python-dateutil==2.8.2
 flask-swagger-ui==4.11.1
 PyYAML==6.0.1
+gunicorn==21.2.0
